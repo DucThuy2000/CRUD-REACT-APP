@@ -1,11 +1,12 @@
+import { Container } from "@mui/material";
 import Button from "@mui/material/Button";
+import Create from "./pages/Create";
 
 function App() {
   return (
-    <>
-      <h1>Are u ready to build the CRUD app ?</h1>
-      <Button variant="contained">Ready</Button>
-    </>
+    <Container maxWidth="md" sx={{ marginTop: '20px' }}>
+      <Create></Create>
+    </Container>
   );
 }
 
