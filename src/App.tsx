@@ -1,12 +1,8 @@
-import { Container } from "@mui/material";
-import Button from "@mui/material/Button";
-import Create from "./pages/Create";
+import Route from "./routes";
 
 function App() {
   return (
-    <Container maxWidth="md" sx={{ marginTop: '20px' }}>
-      <Create></Create>
-    </Container>
+    <Route />
   );
 }
 

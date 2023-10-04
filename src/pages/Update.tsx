@@ -18,43 +18,63 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import model
 import { UserFormFieldsType as FormFieldsType, IUser, ResponseStatus } from "../model"
 
-// import helper
-import { birtdayFormat, validation } from '../utils/helper';
-
 // import state
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 
 // import axios
 import axios from "../plugin/api/axios";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 
 // import router
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
+// import helper
+import { birtdayFormat } from "../utils/helper";
+import dayjs from "dayjs";
 import { Route } from "../routes/path";
 
-const Create = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [birthday, setBirthday] = useState('');
-    const [gender, setGender] = useState('');
-    const navigate = useNavigate();
+const Update = () => {
+    const [user, setUser] = useState<IUser>({
+        id: '',
+        name: '',
+        birthday: '',
+        gender: '',
+        email: ''
+    });
     const { userAxios } = axios;
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-    const onChangeField = (value: string, type: FormFieldsType) => {
+    const getUserByID = async () => {
+        try {
+            const response = await userAxios.getUserByID(id!);
+            if (response.status === ResponseStatus.OK) {
+                const data = response.data;
+                setUser(data);                
+            }
+        } catch (e) {
+            navigate(-1);
+        }
+    }
+
+    useEffect(() => {
+        getUserByID();
+    }, [id])
+
+    const onChangeField = (value: any, type: FormFieldsType) => {
         switch(type) {
             case "name":
-                setName(value);
+                setUser({...user, name: value});
                 break;
             case "birthday":
                 const birthday = birtdayFormat(new Date(value));
-                setBirthday(birthday);
+                setUser({...user, birthday: birthday});
                 break;
             case "email":
-                validation();
-                setEmail(value);
+                setUser({...user, email: value});
                 break;
             case "gender":
-                setGender(value);
+                setUser({...user, gender: value});
                 break;
             default:
                 break;
@@ -63,8 +83,7 @@ const Create = () => {
 
     const onSubmit = async (e: MouseEvent) => {
         e.preventDefault();
-        const data: Omit<IUser, 'id'> = {name, birthday, email, gender};
-        const response = await userAxios.createUser(data);
+        const response = await userAxios.updateUserByID(user);
         if (response.status === ResponseStatus.OK) {
             navigate(Route.root);
         }
@@ -73,12 +92,13 @@ const Create = () => {
     const goBack = () => {
         navigate(-1);
     }
-
-    return (
-        <CardCustomize title="Create Employee">
+    
+    return(
+        <CardCustomize title="Update Employee">
             <Grid container spacing={4}>
                 <Grid item xs={12} md={12}>
                     <TextField
+                        value={user.name}
                         id="name"
                         label="Full Name"
                         variant="standard"
@@ -88,6 +108,7 @@ const Create = () => {
                 </Grid>
                 <Grid item xs={12} md={12}>
                     <TextField
+                        value={user.email}
                         id="email"
                         label="Email"
                         variant="standard"
@@ -101,7 +122,7 @@ const Create = () => {
                             disableFuture
                             sx={{ width: "100%" }}
                             label="Birthday"
-                            value={birthday}
+                            value={dayjs(user.birthday)}
                             onChange={(e) => onChangeField(e!, 'birthday')}
                             views={['year', 'month', 'day']}
                         />
@@ -115,6 +136,7 @@ const Create = () => {
                             aria-labelledby="demo-row-radio-buttons-group-label"
                             name="row-radio-buttons-group"
                             onChange={(e) => onChangeField(e.target.value, 'gender')}
+                            value={user.gender}
                         >
                             <FormControlLabel value="female" control={<Radio />} label="Female" />
                             <FormControlLabel value="male" control={<Radio />} label="Male" />
@@ -131,4 +153,4 @@ const Create = () => {
     );
 }
 
-export default Create;
+export default Update;
