@@ -70,7 +70,8 @@ const Create = () => {
         const data: Omit<IUser, 'id'> = {name, birthday, email, gender};
         showLoading();
         const response = await userAxios.createUser(data);
-        if (response.status === ResponseStatus.OK) {
+        
+        if (response.status === ResponseStatus.CREATED) {
             navigate(Route.root);
             setOpen(true);
             setMessage(`Create new user successfully`);
