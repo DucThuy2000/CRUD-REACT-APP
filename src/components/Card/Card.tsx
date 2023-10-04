@@ -1,6 +1,8 @@
 import { Button, Paper, styled, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import { Link } from "react-router-dom";
+import { Route } from "../../routes/path";
 
 // Define Interface
 interface Props {
@@ -41,23 +43,25 @@ const CardCustomize = (props: Props) => {
                 <Typography variant="h6">{props.title}</Typography>
                 {props.hasButtonAction &&
                     <div>
-                        <Button
+                        {/* <Button
                             variant="contained"
                             color="error"
                             sx={{ mr: 2 }}
                             startIcon={<DeleteIcon />}
                         >
                             Delete
-                        </Button>
+                        </Button> */}
 
-                        <Button
+                        <Link to={Route.create}>
+                            <Button
                             variant="contained"
                             color="success"
                             sx={{ marginRight: '10px' }}
                             startIcon={<AddIcon />}
-                        >
-                            Add New
-                        </Button>
+                            >
+                                Add New
+                            </Button>
+                        </Link>
                     </div>
                 }
             </div>
