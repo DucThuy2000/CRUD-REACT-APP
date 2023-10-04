@@ -1,5 +1,5 @@
 import { Alert, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CardCustomize from "../components/Card/Card";
 import { IUser, ResponseStatus } from "../model";
@@ -8,23 +8,27 @@ import { Route } from "../routes/path";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteDialog from "../components/DeleteDialog";
-import AlertCustom from "../components/AlertCustom";
+import LoadingContext from "../context/LoadingContext";
+import AlertContext from "../context/AlertContext";
 
 const Home = () => {
     const [userId, setUserId] = useState("");
     const [users, setUsers] = useState<IUser[]>([]);
-    const [rowsPerPage, setRowsPerPage] = useState(8);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(0);
     const [openDialog, setOpenDialog] = useState(false);
-    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const { setMessage, setSeverity, setOpen } = useContext(AlertContext);
     const { userAxios } = axios;
     const navigate = useNavigate();
+    const { showLoading, hideLoading } = useContext(LoadingContext);
 
     const getUserData = async () => {
+        showLoading();
         const response = await userAxios.getUser();
         if (response.status === ResponseStatus.OK) {
             setUsers(response.data)
-        }    
+        }
+        hideLoading();
     }
 
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -50,15 +54,13 @@ const Home = () => {
         setOpenDialog(false);
     }
 
-    const hanldeCloseSnackbar = () => {
-        setOpenSnackbar(false);
-    }
-
     const deleteUser = async () => {
         const response = await userAxios.deleteUserByID(userId);
         if (response.status === ResponseStatus.OK) {
             await getUserData();
-            setOpenSnackbar(true);
+            setOpen(true);
+            setSeverity("success");
+            setMessage(`User has id: ${userId} was deleted successfully`);
             handleCloseDialog();
         }
     }
@@ -127,7 +129,7 @@ const Home = () => {
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[8, 15]}
+                rowsPerPageOptions={[5, 10]}
                 component="div"
                 count={users.length}
                 rowsPerPage={rowsPerPage}
@@ -140,12 +142,12 @@ const Home = () => {
                 onclose={handleCloseDialog}
                 onDeleteUser={deleteUser}
             />
-            <AlertCustom
+            {/* <AlertCustom
                 severity="success"
                 message="Deleted Successfully"
                 open={openSnackbar}
                 onClose={hanldeCloseSnackbar}
-            />
+            /> */}
          </CardCustomize>
     );
 }

@@ -22,7 +22,7 @@ import { UserFormFieldsType as FormFieldsType, IUser, ResponseStatus } from "../
 import { birtdayFormat, validation } from '../utils/helper';
 
 // import state
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useContext, useState } from 'react';
 
 // import axios
 import axios from "../plugin/api/axios";
@@ -31,6 +31,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 // import router
 import { useNavigate } from "react-router-dom";
 import { Route } from "../routes/path";
+import LoadingContext from "../context/LoadingContext";
+import AlertContext from "../context/AlertContext";
 
 const Create = () => {
     const [name, setName] = useState('');
@@ -39,6 +41,8 @@ const Create = () => {
     const [gender, setGender] = useState('');
     const navigate = useNavigate();
     const { userAxios } = axios;
+    const { showLoading, hideLoading } = useContext(LoadingContext);
+    const { setMessage, setSeverity, setOpen } = useContext(AlertContext);
 
     const onChangeField = (value: string, type: FormFieldsType) => {
         switch(type) {
@@ -64,10 +68,15 @@ const Create = () => {
     const onSubmit = async (e: MouseEvent) => {
         e.preventDefault();
         const data: Omit<IUser, 'id'> = {name, birthday, email, gender};
+        showLoading();
         const response = await userAxios.createUser(data);
         if (response.status === ResponseStatus.OK) {
             navigate(Route.root);
+            setOpen(true);
+            setMessage(`Create new user successfully`);
+            setSeverity("success");
         }
+        hideLoading();
     }
 
     const goBack = () => {

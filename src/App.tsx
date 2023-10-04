@@ -1,8 +1,14 @@
+import { AlertProvider } from "./context/AlertContext";
+import { LoadingProvider } from "./context/LoadingContext";
 import Route from "./routes";
 
 function App() {
   return (
-    <Route />
+    <LoadingProvider>
+      <AlertProvider>
+        <Route />
+      </AlertProvider>
+    </LoadingProvider>
   );
 }
 

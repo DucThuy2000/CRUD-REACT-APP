@@ -19,7 +19,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { UserFormFieldsType as FormFieldsType, IUser, ResponseStatus } from "../model"
 
 // import state
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent, useContext, useEffect, useState } from 'react';
 
 // import axios
 import axios from "../plugin/api/axios";
@@ -32,6 +32,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { birtdayFormat } from "../utils/helper";
 import dayjs from "dayjs";
 import { Route } from "../routes/path";
+import LoadingContext from "../context/LoadingContext";
+import AlertContext from "../context/AlertContext";
 
 const Update = () => {
     const [user, setUser] = useState<IUser>({
@@ -44,14 +46,18 @@ const Update = () => {
     const { userAxios } = axios;
     const { id } = useParams();
     const navigate = useNavigate();
+    const { showLoading, hideLoading } = useContext(LoadingContext);
+    const { setMessage, setSeverity, setOpen } = useContext(AlertContext);
 
     const getUserByID = async () => {
         try {
+            showLoading();
             const response = await userAxios.getUserByID(id!);
             if (response.status === ResponseStatus.OK) {
                 const data = response.data;
                 setUser(data);                
             }
+            hideLoading();
         } catch (e) {
             navigate(-1);
         }
@@ -83,10 +89,15 @@ const Update = () => {
 
     const onSubmit = async (e: MouseEvent) => {
         e.preventDefault();
+        showLoading();
         const response = await userAxios.updateUserByID(user);
         if (response.status === ResponseStatus.OK) {
             navigate(Route.root);
+            setOpen(true);
+            setMessage(`User has id: ${user.id} was updated successfully`);
+            setSeverity("success");
         }
+        hideLoading();
     }
 
     const goBack = () => {
