@@ -4,19 +4,19 @@ import { createContext, useState } from "react";
 interface IAlertContext {
     setOpen: (val: boolean) => void;
     setMessage: (val: string) => void;
-    setSeverity: (val: any) => void;
+    setSeverity: (val: AlertColor) => void;
 }
 
 const AlertContext = createContext<IAlertContext>({
     setOpen: (val: boolean) => { },
     setMessage: (val: string) => { },
-    setSeverity: (val: any) => { }
+    setSeverity: (val: AlertColor) => { }
 });
 
 export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
     const [open, setOpen] = useState(false);
-    const [severity, setSeverity] = useState(undefined);
-    const [message, setMessage] = useState('');
+    const [severity, setSeverity] = useState("info" as AlertColor);
+    const [message, setMessage] = useState("");
     const handleClose = () => {
         setOpen(false);
     }
